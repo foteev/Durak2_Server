@@ -1,6 +1,6 @@
 import { Socket } from "socket.io-client";
 import { gameStore, gameStoreWithHistory } from "../store/gameStore.mjs";
-import { TypeGameStatus, TypePlayerRole, TypePlayerStatus } from "components/types/types.mjs";
+import { TypeGameStatus, TypePlayerRole, TypePlayerStatus, TypeAction } from "components/types/types.mjs";
 import { giveCards, makePlayerMove, createDeck, undoGameStore, playerPass, clearHands, sortPlayerCards, endGame } from "./utils.js";
 import { subscribe } from "valtio";
 
@@ -69,29 +69,28 @@ export const SocketManager = (socket: any) => {
   socket.on('end game', (playerIndex: number) => {
     endGame(playerIndex);
     socket.emit('end game loser');
-    socket.broadcast.to((players[0].socketId),(players[1].socketId)).emit('end game winner');
+    socket.to(playerIndex === 0 ? players[1].socketId: players[0].socketId).emit('end game winner');
     clearHands();
   })
 
   subscribe(gameStore, () => {
-    console.log('store emitted', gameStore.gameStatus, gameStore.players[0].playerStatus, gameStore.players[1].playerStatus)
+    console.log('store emitted', gameStore.gameStatus, gameStore.players[0].playerName, gameStore.players[0].playerStatus, gameStore.players[0].playerName, gameStore.players[1].playerStatus)
     socket.to(players[0].socketId).emit('store update', JSON.stringify(gameStore));
     socket.to(players[1].socketId).emit('store update', JSON.stringify(gameStore));
   })
 
-  // subscribe(gameStore.players, () => {
-  //   if (gameStore.gameStatus === TypeGameStatus.GameInProgress) {
-  //     if (gameStore.players[0].cards.length === 0) {
-  //       endGame(0);
-  //       socket.to(players[0].socketId).emit('end game loser');
-  //       socket.broadcast.to(players[0].socketId,players[1].socketId).emit('end game winner');
-  //       console.log('end game sub 0');
-  //     } else if (gameStore.players[1].cards.length === 0) {
-  //       endGame(1);
-  //       socket.to(players[1].socketId).emit('end game loser');
-  //       socket.broadcast.to(players[0].socketId,players[1].socketId).emit('end game winner');
-  //       console.log('end game sub 1');
-  //     }
-  //   }
-  // })
+  subscribe(gameStore.players, () => {
+    if (gameStore.gameStatus === TypeGameStatus.GameInProgress 
+      && gameStore.lastAction !== TypeAction.Undefined
+      && gameStore.deckCards.length === 0) {
+      gameStore.players.forEach((player, playerIndex) => {
+        if (player.cards.length === 0) {
+          const otherPlayerIndex = playerIndex === 0 ? 1: 0
+          endGame(playerIndex);
+          socket.to(players[playerIndex].socketId).emit('end game winner');
+          socket.to(players[otherPlayerIndex].socketId).emit('end game loser');
+        }
+      })
+    }
+  })
 }
