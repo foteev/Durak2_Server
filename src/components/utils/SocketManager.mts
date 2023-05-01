@@ -29,10 +29,9 @@ export const SocketManager = (socket: any) => {
     else if (players[1].playerStatus === TypePlayerStatus.Offline && players[0].playerStatus === TypePlayerStatus.InGame) {
       console.log('player 1 enter')
       players[1].playerName = message.name;
-      socket.emit('player 1 enter', JSON.stringify(gameStore));
       players[1].socketId = message.socketId;
       players[1].playerStatus = TypePlayerStatus.InGame
-      
+      socket.emit('player 1 enter', JSON.stringify(gameStore));
     }
     else if (players[0].playerName === message.name) {
       players[0].socketId = message.socketId;
@@ -69,8 +68,9 @@ export const SocketManager = (socket: any) => {
 
   socket.on('end game', (playerIndex: number) => {
     endGame(playerIndex);
-    socket.emit('end game done', playerIndex);
-    // clearHands();
+    socket.emit('end game loser');
+    socket.broadcast.to((players[0].socketId),(players[1].socketId)).emit('end game winner');
+    clearHands();
   })
 
   subscribe(gameStore, () => {
@@ -78,4 +78,20 @@ export const SocketManager = (socket: any) => {
     socket.to(players[0].socketId).emit('store update', JSON.stringify(gameStore));
     socket.to(players[1].socketId).emit('store update', JSON.stringify(gameStore));
   })
+
+  // subscribe(gameStore.players, () => {
+  //   if (gameStore.gameStatus === TypeGameStatus.GameInProgress) {
+  //     if (gameStore.players[0].cards.length === 0) {
+  //       endGame(0);
+  //       socket.to(players[0].socketId).emit('end game loser');
+  //       socket.broadcast.to(players[0].socketId,players[1].socketId).emit('end game winner');
+  //       console.log('end game sub 0');
+  //     } else if (gameStore.players[1].cards.length === 0) {
+  //       endGame(1);
+  //       socket.to(players[1].socketId).emit('end game loser');
+  //       socket.broadcast.to(players[0].socketId,players[1].socketId).emit('end game winner');
+  //       console.log('end game sub 1');
+  //     }
+  //   }
+  // })
 }

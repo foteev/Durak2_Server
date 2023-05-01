@@ -28,7 +28,10 @@ const app = express();
 const httpServer = http.createServer(app);
 export const io = new Server(httpServer, {
     cors: {
-        origin: "http://localhost:3000"
+        origin: [
+            "https://durak2.netlify.app",
+            "http://localhost:3000"
+        ]
     }
   });
 

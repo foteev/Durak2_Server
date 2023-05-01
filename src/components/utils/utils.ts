@@ -160,14 +160,14 @@ export const playerPass = (playerIndex: number) => {
 }
 
 export const clearHands = () => {
-  const startSnapshot = gameStoreWithHistory.history.snapshots[2] as TypeGameStore;
+  const startSnapshot = gameStoreWithHistory.history.snapshots[3] as TypeGameStore;
   gameStore.deckCards = [...startSnapshot.deckCards!];
   gameStore.players[0].cards = [...startSnapshot.players[0].cards!];
   gameStore.players[1].cards = [...startSnapshot.players[1].cards!];
   gameStore.players[0].playerRole = startSnapshot.players[0].playerRole;
   gameStore.players[1].playerRole = startSnapshot.players[1].playerRole;
-  gameStore.players[0].playerStatus = startSnapshot.players[0].playerStatus;
-  gameStore.players[1].playerStatus = startSnapshot.players[1].playerStatus;
+  gameStore.players[0].playerStatus = TypePlayerStatus.InGame;
+  gameStore.players[1].playerStatus = TypePlayerStatus.InGame;
   gameStore.gameStatus = startSnapshot.gameStatus;
   if (gameStore.placedCards) {
     gameStore.placedCards = [];
