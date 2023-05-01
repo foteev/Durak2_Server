@@ -1,4 +1,4 @@
-import { Socket } from "socket.io-client";
+import { Socket } from "socket.io";
 import { gameStore, gameStoreWithHistory } from "../store/gameStore.mjs";
 import { TypeGameStatus, TypePlayerRole, TypePlayerStatus, TypeAction } from "components/types/types.mjs";
 import { giveCards, makePlayerMove, createDeck, undoGameStore, playerPass, clearHands, sortPlayerCards, endGame } from "./utils.js";
