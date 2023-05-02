@@ -29,7 +29,8 @@ export const io = new Server(httpServer, {
             "https://durak2.netlify.app",
             "http://localhost:3000"
         ]
-    }
+    },
+    pingInterval: 60000,
   });
 
 app.use(cors());
@@ -54,7 +55,9 @@ const startServer = async () => {
 
 startServer();
 
-const snap = snapshot(gameStore);
+// const snap = snapshot(gameStore);
 createDeck();
 
 io.on('connection', SocketManager);
+
+export const roomNamespace = io.of("/");

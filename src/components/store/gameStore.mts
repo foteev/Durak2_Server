@@ -21,33 +21,24 @@ const player2: TypePlayer = {
   cards: [],
 }
 
-export const gameStoreWithHistory = proxyWithHistory<TypeGameStore>({
+export const initialObj = {
   id: '1',
-
   gameStatus: TypeGameStatus.WaitingForPlayers,
-
   hostId: 'host',
-
   deckCards: [],
-
   lastAttackerCard: null,
-
   placedCards: [],
-
   players: [
     player1,
     player2
   ],
-
   lastAction: TypeAction.Undefined,
-
   dealtCards: [],
-});
+}
+
+export const gameStoreWithHistory = proxyWithHistory<TypeGameStore>(initialObj);
 
 export const gameStore = gameStoreWithHistory.value;
-
-
-// localStorage.setItem('gamestore', JSON.stringify(gameStore))
 
 subscribe(gameStore, () => {
   console.log('store changed')
